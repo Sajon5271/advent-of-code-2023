@@ -1,7 +1,7 @@
 import { createReadStream } from 'node:fs';
 import readline from 'node:readline';
 
-const textFile = createReadStream('input-day1.txt', 'utf-8');
+const textFile = createReadStream(__dirname + '\\input-day1.txt', 'utf-8');
 
 const numberInText = 'one,two,three,four,five,six,seven,eight,nine'.split(',');
 
