@@ -1,60 +1,80 @@
-import { createReadStream } from 'node:fs';
-import readline from 'node:readline';
+import { readFileSync } from 'node:fs';
 
-const possibleCubeColors = ['red', 'green', 'blue'];
-const limit = { red: 12, green: 13, blue: 14 };
-
+const dirs = [
+  { x: -1, y: -1 },
+  { x: -1, y: 0 },
+  { x: -1, y: 1 },
+  { x: 0, y: -1 },
+  { x: 0, y: 0 },
+  { x: 0, y: 1 },
+  { x: 1, y: -1 },
+  { x: 1, y: 0 },
+  { x: 1, y: 1 },
+];
 export async function resultOutput(fileName: string): Promise<number> {
   return new Promise((resolve, reject) => {
-    const textFile = createReadStream(__dirname + '\\' + fileName, 'utf-8');
+    const textFile = readFileSync(__dirname + '\\' + fileName, 'utf-8');
 
-    const reader = readline.createInterface({
-      input: textFile,
-      crlfDelay: Infinity,
-    });
+    const dataArr = textFile.split('\n').map((el) => el.split(''));
 
+    const specialCharPos: { x: number; y: number }[] = [];
+    for (let i = 0; i < dataArr.length; i++) {
+      for (let j = 0; j < dataArr[i].length; j++) {
+        if (dataArr[i][j] === '*') {
+          specialCharPos.push({ x: i, y: j });
+        }
+      }
+    }
     let total = 0;
+    specialCharPos.forEach((el) => {
+      const numbersToMultiply: number[] = [];
+      dirs.forEach((dir) => {
+        const currX = el.x + dir.x;
+        const currY = el.y + dir.y;
+        if (
+          currX < 0 ||
+          currX > dataArr.length ||
+          currY < 0 ||
+          currY > dataArr[0].length
+        ) {
+          return;
+        }
+        if (dataArr[currX][currY] === '.') return;
+        let currPoint = dataArr[currX][currY];
+        let predY = currY;
+        while (currPoint >= '0' && currPoint <= '9' && predY >= 0) {
+          predY--;
+          currPoint = dataArr[currX][predY];
+        }
+        predY++;
+        const gatherNumbers = [];
+        currPoint = dataArr[currX][predY];
+        while (
+          currPoint >= '0' &&
+          currPoint <= '9' &&
+          predY <= dataArr[0].length
+        ) {
+          gatherNumbers.push(currPoint);
+          dataArr[currX][predY] = '.';
+          predY++;
+          currPoint = dataArr[currX][predY];
+        }
+        if (!gatherNumbers.length) return;
+        const number = parseInt(gatherNumbers.join(''));
+        numbersToMultiply.push(number);
+      });
 
-    reader.on('line', (line) => {
-      const gameNumber = parseInt(line.split(':')[0].split(' ')[1]);
-      const rounds = line
-        .split(':')[1]
-        .split(';')
-        .map((el) => {
-          return el
-            .split(',')
-            .map((x) => {
-              const cubeInfo = x.split(' ').filter((val) => !!val);
-              return { [cubeInfo[1]]: parseInt(cubeInfo[0]) };
-            })
-            .reduce((acc, curr) => {
-              return { ...acc, ...curr };
-            }, {});
-        });
-      const minNeeded = rounds.reduce((acc, curr) => {
-        curr.red = curr.red || 0;
-        curr.green = curr.green || 0;
-        curr.blue = curr.blue || 0;
-
-        return {
-          red: acc.red && acc.red > curr.red ? acc.red : curr.red,
-          green: acc.green && acc.green > curr.green ? acc.green : curr.green,
-          blue: acc.blue && acc.blue > curr.blue ? acc.blue : curr.blue,
-        };
-      }, {});
-      total +=
-        (minNeeded.red || 1) * (minNeeded.green || 1) * (minNeeded.blue || 1);
+      if (numbersToMultiply.length !== 2) {
+        return;
+      } else {
+        total += numbersToMultiply[0] * numbersToMultiply[1];
+      }
     });
-    reader.on('close', () => {
-      resolve(total);
-    });
-    reader.on('error', (err) => {
-      reject(err);
-    });
+    resolve(total);
   });
 }
 
 (async function () {
-  const res = await resultOutput('input-day2.txt');
+  const res = await resultOutput('input-day3.txt');
   console.log(res);
 })();
