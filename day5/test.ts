@@ -7,8 +7,8 @@ describe('Test for advent of code day 5', () => {
     expect.assertions(1);
     return expect(firstPuzzleResult('test.txt')).resolves.toBe(35);
   });
-  // test('Expect given test input to output 30 in last` puzzle', () => {
-  //   expect.assertions(1);
-  //   return expect(finalPuzzleResult('test.txt')).resolves.toBe(30);
-  // });
+  test('Expect given test input to output 46 in last` puzzle', () => {
+    expect.assertions(1);
+    return expect(finalPuzzleResult('test.txt')).resolves.toBe(46);
+  });
 });
