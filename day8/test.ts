@@ -9,7 +9,6 @@ describe('Test for advent of code day 7', () => {
     expect(firstPuzzleResult('test2.txt')).resolves.toBe(6);
   });
   test('Expect given test input to output 6 in last` puzzle', () => {
-    expect.assertions(1);
-    return expect(finalPuzzleResult('test-2star.txt')).resolves.toBe(6);
+    return expect(finalPuzzleResult('test-2star.txt')).toBe(6);
   });
 });
