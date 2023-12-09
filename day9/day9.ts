@@ -1,6 +1,4 @@
 import { readFileSync } from 'node:fs';
-import { lcm, transpose } from 'mathjs';
-import { min } from 'lodash';
 
 export function resultOutput(fileName: string): number {
   const textFile = readFileSync(__dirname + '\\' + fileName, 'utf-8');
